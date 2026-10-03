@@ -34,10 +34,13 @@ async function authorized(request: Request, env: Env): Promise<boolean> {
   )
     return true;
 
-  if (!env.ACCESS_TEAM_DOMAIN || !env.ACCESS_AUD || !env.ALLOWED_EMAILS) return false;
+  if (!env.ACCESS_TEAM_DOMAIN || !env.ACCESS_AUD || !env.ALLOWED_EMAILS)
+    return false;
 
   const allowed = new Set(
-    env.ALLOWED_EMAILS.split(",").map(email => email.trim().toLowerCase()).filter(Boolean),
+    env.ALLOWED_EMAILS.split(",")
+      .map((email) => email.trim().toLowerCase())
+      .filter(Boolean),
   );
 
   const token = request.headers.get("cf-access-jwt-assertion");

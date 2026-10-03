@@ -1,5 +1,5 @@
 {
-  "name": "personal-finances-app",
+  "name": "finance-tracker",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -8,14 +8,15 @@
     "node": ">=22.18.0"
   },
   "scripts": {
-    "dev": "pnpm build && wrangler dev --ip 127.0.0.1 --port 4317",
+    "dev": "pnpm build && pnpm alchemy dev --env-file .dev.vars --stage local",
     "build": "node build.mjs",
-    "db:local": "wrangler d1 migrations apply DB --local",
-    "plan": "alchemy plan --env-file .dev.vars --stage prod --no-input",
-    "deploy": "alchemy deploy --env-file .dev.vars --stage prod --no-input --yes",
+    "alchemy": "node --env-file=.dev.vars node_modules/alchemy/bin/cli.js",
+    "plan": "pnpm alchemy plan --env-file .dev.vars --stage prod --no-input",
+    "deploy": "pnpm alchemy deploy --env-file .dev.vars --stage prod --no-input --yes",
+    "destroy": "pnpm alchemy destroy --env-file .dev.vars --stage prod",
     "lint": "oxlint --deny-warnings",
     "lint:fix": "oxlint --fix --deny-warnings",
-    "format": "prettier --write src public build.mjs package.json tsconfig.json .oxlintrc.json",
+    "format": "prettier --write src public alchemy.run.ts build.mjs package.json tsconfig.json .oxlintrc.json",
     "typecheck": "tsc --noEmit",
     "prepare": "node install-hooks.mjs"
   },
@@ -35,8 +36,7 @@
     "oxlint": "1.86.0",
     "prettier": "^3.0.0",
     "tsx": "^4.23.15",
-    "typescript": "^5.9.0",
-    "wrangler": "^4.147.0"
+    "typescript": "^5.9.0"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

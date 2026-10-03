@@ -11,7 +11,8 @@
 !/build.mjs
 !/install-hooks.mjs
 !/lefthook.yml
-!/wrangler.jsonc
+!/alchemy.run.ts
+!/AGENTS.md
 !/src/
 !/public/
 !/migrations/
