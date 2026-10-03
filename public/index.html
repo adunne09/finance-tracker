@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+    <title>Household finances</title>
+    <link rel="icon" href="/favicon.svg" />
+    <link rel="stylesheet" href="/style.css" />
+    <script type="module" src="/client.js"></script>
+  </head>
+  <body>
+    <div class="shell">
+      <header>
+        <a class="brand" href="/">f. <span>Household finances</span></a
+        ><span class="private">Private household</span>
+      </header>
+      <main>
+        <section class="heading">
+          <div>
+            <p class="eyebrow">THE BIG PICTURE</p>
+            <h1>Know where it goes.</h1>
+            <p class="muted">
+              Your accounts, together. Automatically organized.
+            </p>
+          </div>
+          <p id="freshness" class="muted" role="status" aria-live="polite">
+            Updates automatically
+          </p>
+        </section>
+        <p id="notice" role="status" aria-live="polite" hidden></p>
+        <div class="filters">
+          <label
+            >Period<select id="period">
+              <option value="">All available history</option>
+            </select></label
+          ><label
+            >Account<select id="account">
+              <option value="">All accounts</option>
+            </select></label
+          >
+        </div>
+        <section class="metrics" aria-label="Period summary">
+          <article>
+            <span>Net spending</span><strong id="spending">—</strong
+            ><small>Purchases less refunds</small>
+          </article>
+          <article>
+            <span>Income</span><strong id="income">—</strong
+            ><small>Excludes transfers & rewards</small>
+          </article>
+          <article>
+            <span>Reimbursements</span><strong id="reimbursements">—</strong
+            ><small>Reported separately</small>
+          </article>
+        </section>
+        <p class="muted" id="coverage">Loading your ledger…</p>
+        <section class="panel">
+          <h2>Where it went</h2>
+          <div id="categories" class="categories"></div>
+        </section>
+        <section class="panel ledger">
+          <div class="section-heading">
+            <h2>Transactions <span id="count"></span></h2>
+            <button id="clear" class="secondary">Clear filters</button>
+          </div>
+          <div class="filters transaction-filters">
+            <label class="search"
+              >Search<input
+                id="search"
+                type="search"
+                placeholder="Merchant or label" /></label
+            ><label
+              >Category<select id="category">
+                <option value="">All categories</option>
+              </select></label
+            ><label
+              >Movement<select id="movement">
+                <option value="">All movements</option>
+              </select></label
+            >
+          </div>
+          <div id="transactions"></div>
+          <button id="more" class="secondary" hidden>Show more</button>
+        </section>
+        <details class="panel connections">
+          <summary>Connected accounts <span id="sync-status"></span></summary>
+          <div id="connections"></div>
+          <p class="muted">
+            Only connected accounts and history available through Plaid are
+            included. Payments to unconnected cards do not include their purchase
+            histories. CSV/PDF imports are not included.
+          </p>
+        </details>
+      </main>
+      <footer>
+        Powered by Plaid · Categorized by Jev · Labels are yours to change
+      </footer>
+    </div>
+  </body>
+</html>

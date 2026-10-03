@@ -1,0 +1,47 @@
+{
+  "name": "personal-finances-app",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.28.1",
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "scripts": {
+    "dev": "pnpm build && wrangler dev --ip 127.0.0.1 --port 4317",
+    "build": "node build.mjs",
+    "db:local": "wrangler d1 migrations apply DB --local",
+    "plan": "alchemy plan --env-file .dev.vars --stage prod --no-input",
+    "deploy": "alchemy deploy --env-file .dev.vars --stage prod --no-input --yes",
+    "lint": "oxlint --deny-warnings",
+    "lint:fix": "oxlint --fix --deny-warnings",
+    "format": "prettier --write src public build.mjs package.json tsconfig.json .oxlintrc.json",
+    "typecheck": "tsc --noEmit",
+    "prepare": "node install-hooks.mjs"
+  },
+  "dependencies": {
+    "@effect/platform-node": "4.0.0",
+    "@typesafe-ai/sdk": "0.6.0",
+    "effect": "4.0.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20261003.1",
+    "@oxlint/plugins": "1.86.0",
+    "@types/node": "^22.0.0",
+    "alchemy": "2.0.0-beta.80",
+    "esbuild": "^0.25.0",
+    "jose": "^6.2.12",
+    "lefthook": "^2.0.0",
+    "oxlint": "1.86.0",
+    "prettier": "^3.0.0",
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.0",
+    "wrangler": "^4.147.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "lefthook"
+    ]
+  }
+}
