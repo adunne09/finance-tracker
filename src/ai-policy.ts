@@ -46,8 +46,21 @@ export function evidence(transaction: Transaction, account: Account) {
 
 export type Evidence = ReturnType<typeof evidence>;
 
+export function appleDigitalBilling(input: Evidence): boolean {
+  return /\bAPPLE\s*\.\s*COM\s*\/\s*BILL\b|\bITUNES\b|\bAPP\s+STORE\b|\bICLOUD\b/i.test(
+    `${input.merchant} ${input.description}`,
+  );
+}
+
+export function policyVersion(input: Evidence): string {
+  // Invalidate only the affected evidence; unrelated cached judgments stay valid.
+  return appleDigitalBilling(input)
+    ? `${questionVersion}-apple-digital-v1`
+    : questionVersion;
+}
+
 export function classificationKey(input: Evidence, model: string): string {
   return createHash("sha256")
-    .update(JSON.stringify([questionVersion, model, input]))
+    .update(JSON.stringify([policyVersion(input), model, input]))
     .digest("hex");
 }

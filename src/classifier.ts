@@ -3,7 +3,12 @@ import type { ChoiceQuestion } from "@typesafe-ai/sdk";
 import { Context, Effect, Layer, Redacted, Schedule, Schema } from "effect";
 import { Settings } from "./config.ts";
 import { AppError, Classification } from "./domain.ts";
-import { classificationKey, evidence, questionVersion } from "./ai-policy.ts";
+import {
+  appleDigitalBilling,
+  classificationKey,
+  evidence,
+  policyVersion,
+} from "./ai-policy.ts";
 import type { Evidence } from "./ai-policy.ts";
 import { Store } from "./store.ts";
 import { categoryCriteria } from "./taxonomy.ts";
@@ -31,6 +36,10 @@ export const movementCriteria = {
 };
 
 export function questionsFor(input: Evidence) {
+  const applePolicy = appleDigitalBilling(input)
+    ? "Household categorization preference: Apple.com/bill, iTunes, App Store and iCloud digital charges belong in software, including digital subscriptions. This evidence is digital billing, not an Apple hardware purchase."
+    : "Apple.com/bill or Apple billing without product is uncategorized.";
+
   return {
     movement: choice(
       {
@@ -50,8 +59,7 @@ export function questionsFor(input: Evidence) {
       {
         task: "Select the spending category of this transaction, assuming it represents a purchase or a purchase refund.",
         transaction: input,
-        policy:
-          "Use merchant, description and Plaid hint together; explicit merchant/product evidence overrides incorrect bank hints. Classify TypeSafe, Cloudflare, OpenAI, Anthropic, Fal and other developer/AI tools as software, not consulting/education. Recurring media and retail memberships belong in memberships. Education means actual instruction. Costco warehouse and general retailers belong in shopping unless fuel or membership is explicit. Uber rides belong in transportation; Uber Eats belongs in dining. Apple.com/bill or Apple billing without product is uncategorized. Refunds use the original merchant category. Never infer personal/business purpose, gifts from gift-shop names, or groceries from general retailers. This is merchant-level classification, not a claim about items purchased.",
+        policy: `Use merchant, description and Plaid hint together; explicit merchant/product evidence overrides incorrect bank hints. Classify TypeSafe, Cloudflare, OpenAI, Anthropic, Fal and other developer/AI tools as software, not consulting/education. Recurring media and retail memberships belong in memberships. Education means actual instruction. Costco warehouse and general retailers belong in shopping unless fuel or membership is explicit. Uber rides belong in transportation; Uber Eats belongs in dining. ${applePolicy} Refunds use the original merchant category. Never infer personal/business purpose, gifts from gift-shop names, or groceries from general retailers. This is merchant-level classification, not a claim about items purchased.`,
       },
       categoryCriteria,
     ),
@@ -91,16 +99,17 @@ const make = Effect.gen(function* () {
     const reused = new Map<string, string>();
 
     for (const row of snapshot.rows) {
-      if (
-        row.transaction.pending ||
-        (row.classification?.version === questionVersion &&
-          row.classification.model === settings.model)
-      )
-        continue;
+      if (row.transaction.pending) continue;
       const account = accounts.get(row.transaction.account);
 
       if (!account) continue;
       const input = evidence(row.transaction, account);
+
+      if (
+        row.classification?.version === policyVersion(input) &&
+        row.classification.model === settings.model
+      )
+        continue;
       const key = classificationKey(input, settings.model);
 
       keys.push({ id: row.transaction.id, key });
@@ -192,7 +201,7 @@ const make = Effect.gen(function* () {
           categoryConfidence: category.confidence,
           movementConfidence: movement.confidence,
           model: response.model,
-          version: questionVersion,
+          version: policyVersion(entry.input),
           source: "jev",
         });
 

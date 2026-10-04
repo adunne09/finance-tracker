@@ -4,7 +4,7 @@ import type {
   LedgerRow,
   Transaction,
 } from "./domain.ts";
-import { evidence, questionVersion, sanitize } from "./ai-policy.ts";
+import { evidence, policyVersion, sanitize } from "./ai-policy.ts";
 
 // Controlled normalization, not model-generated regexes. Preserve meaningful
 // product words (Eats, fuel, membership, etc.) even when the merchant is shared.
@@ -60,7 +60,7 @@ export function learnPatterns(
       row.transaction.pending ||
       !account ||
       !value ||
-      value.version !== questionVersion ||
+      value.version !== policyVersion(evidence(row.transaction, account)) ||
       value.model !== model
     )
       continue;

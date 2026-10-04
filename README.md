@@ -15,6 +15,9 @@ Built with TypeScript, Effect, Cloudflare Workers and D1.
 Payments and internal transfers are excluded from spending/income. Refunds reduce
 spending; reimbursements are reported separately. Only connected account histories
 are included. There are no CSV/PDF imports or payment-initiation features.
+Spending-category filters show the same posted USD purchases/refunds used in
+category totals; payment and income rows are found through the movement filter.
+Clicking a category total clears search/movement filters so its drill-down matches.
 
 ## Local development
 
@@ -60,6 +63,9 @@ bank category hints. It does not receive amounts, dates, account identifiers,
 balances or complete histories. Exact results are cached by evidence, policy and
 model. Consistent normalized patterns reuse prior judgments; conflicting or novel
 patterns fall back to Jev. Manual changes remain transaction-specific.
+Apple digital billing is categorized as software; Apple hardware and card payments
+retain separate treatment. Evidence-scoped policy revisions invalidate affected
+cached judgments without rerunning unrelated classifications.
 
 ## Checks
 

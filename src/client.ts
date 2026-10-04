@@ -88,14 +88,18 @@ function effective(row: LedgerRow) {
   return row.correction ?? row.classification;
 }
 
-function spending(row: LedgerRow): number {
+function contributesToSpending(row: LedgerRow): boolean {
   const movement = effective(row)?.movement;
 
-  return !row.transaction.pending &&
+  return (
+    !row.transaction.pending &&
     row.transaction.currency === "USD" &&
     (movement === "expense" || movement === "refund")
-    ? -row.transaction.cents
-    : 0;
+  );
+}
+
+function spending(row: LedgerRow): number {
+  return contributesToSpending(row) ? -row.transaction.cents : 0;
 }
 
 function periodRows(): readonly LedgerRow[] {
@@ -172,7 +176,9 @@ function render(): void {
     const c = effective(row);
 
     return (
-      (!select("category").value || c?.category === select("category").value) &&
+      (!select("category").value ||
+        (contributesToSpending(row) &&
+          c?.category === select("category").value)) &&
       (!select("movement").value || c?.movement === select("movement").value) &&
       `${row.transaction.description} ${row.transaction.merchant} ${row.correction?.label ?? ""}`
         .toLowerCase()
@@ -309,6 +315,11 @@ element("categories").addEventListener("click", (event) => {
 
     if (button) {
       select("category").value = button.dataset.category ?? "";
+      select("movement").value = "";
+      search = "";
+      const input = element("search");
+
+      if (input instanceof HTMLInputElement) input.value = "";
       visible = 50;
       render();
       element("transactions").scrollIntoView({
