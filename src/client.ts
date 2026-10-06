@@ -199,7 +199,9 @@ function render(): void {
           ? c.movement === "expense" || c.movement === "refund"
             ? categories[c.category]
             : transactionTypes[c.movement]
-          : "Classifying…";
+          : tx.pending
+            ? "Pending"
+            : "Classifying…";
 
         return `<details class="transaction" data-id="${escape(tx.id)}"><summary><span class="tx-date">${escape(tx.date)}</span><span class="tx-name">${escape(row.correction?.label || tx.merchant || tx.description)}<small>${escape(account ? `${account.institution} · ${account.name} ${account.mask}` : "Unknown account")}${tx.pending ? " · Pending" : ""}${row.correction ? " · Edited" : ""}</small></span><span class="tx-category">${escape(category)}</span><span class="tx-amount ${tx.cents > 0 ? "credit" : ""}">${tx.cents > 0 ? "+" : ""}${tx.currency === "USD" ? money(tx.cents) : `${tx.cents / 100} ${escape(tx.currency)}`}</span></summary><div class="editor"><p>${escape(tx.description)}${tx.authorizedDate ? ` · Authorized ${escape(tx.authorizedDate)}` : ""}</p><form><label>Category<select name="category">${options(categories, c?.category ?? "uncategorized")}</select></label><label>Movement<select name="movement">${options(transactionTypes, c?.movement ?? "unknown")}</select></label><label>Display label<input name="label" maxlength="100" value="${escape(row.correction?.label ?? "")}" placeholder="${escape(tx.merchant || tx.description)}" /></label><div class="actions"><button type="submit">Save changes</button>${row.correction ? '<button type="button" class="secondary" data-reset>Use automatic classification</button>' : ""}</div></form><p>${row.classification ? `Jev: ${escape(transactionTypes[row.classification.movement])} · ${escape(categories[row.classification.category])}` : "Automatic classification runs after sync."} · Manual edits are preserved.</p></div></details>`;
       })
